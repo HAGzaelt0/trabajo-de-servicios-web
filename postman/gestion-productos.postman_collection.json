@@ -1,0 +1,102 @@
+{
+  "info": {
+    "name": "Gestion de productos - UAM",
+    "description": "Flujo de categorias, proveedores y productos relacionados. Ejecutar las solicitudes en orden.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "categoriaId", "value": "" },
+    { "key": "categoriaAccesoriosId", "value": "" },
+    { "key": "proveedorId", "value": "" },
+    { "key": "proveedorAlternoId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Categorias",
+      "item": [
+        {
+          "name": "Crear Computadoras",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Computadoras\",\n  \"activa\": true\n}" },
+            "url": "{{baseUrl}}/api/categorias"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Categoria creada', function () { pm.response.to.have.status(200); });", "pm.collectionVariables.set('categoriaId', pm.response.json().id);"] } }]
+        },
+        {
+          "name": "Crear Accesorios",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Accesorios\",\n  \"activa\": true\n}" },
+            "url": "{{baseUrl}}/api/categorias"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Categoria creada', function () { pm.response.to.have.status(200); });", "pm.collectionVariables.set('categoriaAccesoriosId', pm.response.json().id);"] } }]
+        },
+        {
+          "name": "Crear Monitores",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Monitores\",\n  \"activa\": true\n}" },
+            "url": "{{baseUrl}}/api/categorias"
+          }
+        },
+        { "name": "Listar categorias", "request": { "method": "GET", "url": "{{baseUrl}}/api/categorias" } }
+      ]
+    },
+    {
+      "name": "Proveedores",
+      "item": [
+        {
+          "name": "Crear Distribuidora Central",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Distribuidora Central\",\n  \"telefono\": \"2255-0101\",\n  \"correo\": \"central-{{$timestamp}}-{{$randomInt}}@example.com\",\n  \"activo\": true\n}" },
+            "url": "{{baseUrl}}/api/proveedores"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Proveedor creado', function () { pm.response.to.have.status(200); });", "pm.collectionVariables.set('proveedorId', pm.response.json().id);"] } }]
+        },
+        {
+          "name": "Crear Tecnologia Norte",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Tecnologia Norte\",\n  \"telefono\": \"2255-0202\",\n  \"correo\": \"norte-{{$timestamp}}-{{$randomInt}}@example.com\",\n  \"activo\": true\n}" },
+            "url": "{{baseUrl}}/api/proveedores"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Proveedor creado', function () { pm.response.to.have.status(200); });", "pm.collectionVariables.set('proveedorAlternoId', pm.response.json().id);"] } }]
+        },
+        { "name": "Listar proveedores", "request": { "method": "GET", "url": "{{baseUrl}}/api/proveedores" } }
+      ]
+    },
+    {
+      "name": "Productos",
+      "item": [
+        {
+          "name": "Crear Laptop Lenovo",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"codigo\": \"LAP-{{$timestamp}}-{{$randomInt}}\",\n  \"nombre\": \"Laptop Lenovo\",\n  \"descripcion\": \"Laptop para trabajo y estudio\",\n  \"precioVenta\": 850.00,\n  \"existencia\": 10,\n  \"categoriaId\": {{categoriaId}},\n  \"proveedorId\": {{proveedorId}}\n}" },
+            "url": "{{baseUrl}}/api/productos"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Producto creado con relaciones', function () {", "  pm.response.to.have.status(200);", "  const producto = pm.response.json();", "  pm.expect(producto.categoriaNombre).to.eql('Computadoras');", "  pm.expect(producto.proveedorNombre).to.eql('Distribuidora Central');", "});"] } }]
+        },
+        {
+          "name": "Crear Mouse inalambrico",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"codigo\": \"ACC-{{$timestamp}}-{{$randomInt}}\",\n  \"nombre\": \"Mouse inalambrico\",\n  \"descripcion\": \"Mouse optico USB\",\n  \"precioVenta\": 18.50,\n  \"existencia\": 25,\n  \"categoriaId\": {{categoriaAccesoriosId}},\n  \"proveedorId\": {{proveedorAlternoId}}\n}" },
+            "url": "{{baseUrl}}/api/productos"
+          }
+        },
+        { "name": "Listar productos", "request": { "method": "GET", "url": "{{baseUrl}}/api/productos" } }
+      ]
+    }
+  ]
+}

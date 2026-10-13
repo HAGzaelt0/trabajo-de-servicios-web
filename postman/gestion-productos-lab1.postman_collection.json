@@ -1,0 +1,105 @@
+{
+  "info": {
+    "name": "Gestion de productos - Laboratorio Uno",
+    "description": "CRUD, consultas por relaciones y asociacion N:M Producto-Etiqueta.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "categoriaId", "value": "" },
+    { "key": "proveedorId", "value": "" },
+    { "key": "productoId", "value": "" },
+    { "key": "productoAlternoId", "value": "" },
+    { "key": "etiquetaId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Preparacion",
+      "item": [
+        {
+          "name": "Crear categoria Computadoras",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Computadoras\",\n  \"activa\": true\n}" },
+            "url": "{{baseUrl}}/api/categorias"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Categoria creada', function () { pm.response.to.have.status(200); });", "pm.collectionVariables.set('categoriaId', pm.response.json().id);"] } }]
+        },
+        {
+          "name": "Crear proveedor",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Proveedor Laboratorio\",\n  \"telefono\": \"2255-0303\",\n  \"correo\": \"laboratorio-{{$timestamp}}-{{$randomInt}}@example.com\",\n  \"activo\": true\n}" },
+            "url": "{{baseUrl}}/api/proveedores"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Proveedor creado', function () { pm.response.to.have.status(200); });", "pm.collectionVariables.set('proveedorId', pm.response.json().id);"] } }]
+        }
+      ]
+    },
+    {
+      "name": "CRUD productos",
+      "item": [
+        {
+          "name": "POST crear laptop",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"codigo\": \"LAB-LAP-{{$timestamp}}-{{$randomInt}}\",\n  \"nombre\": \"Laptop Lenovo\",\n  \"descripcion\": \"Equipo para el laboratorio\",\n  \"precioVenta\": 850.00,\n  \"existencia\": 10,\n  \"categoriaId\": {{categoriaId}},\n  \"proveedorId\": {{proveedorId}}\n}" },
+            "url": "{{baseUrl}}/api/productos"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Producto creado', function () { pm.response.to.have.status(200); });", "pm.collectionVariables.set('productoId', pm.response.json().id);"] } }]
+        },
+        {
+          "name": "POST crear producto alterno",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"codigo\": \"LAB-ACC-{{$timestamp}}-{{$randomInt}}\",\n  \"nombre\": \"Mouse inalambrico\",\n  \"descripcion\": \"Accesorio de prueba\",\n  \"precioVenta\": 18.50,\n  \"existencia\": 25,\n  \"categoriaId\": {{categoriaId}},\n  \"proveedorId\": {{proveedorId}}\n}" },
+            "url": "{{baseUrl}}/api/productos"
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Segundo producto creado', function () { pm.response.to.have.status(200); });", "pm.collectionVariables.set('productoAlternoId', pm.response.json().id);"] } }]
+        },
+        { "name": "GET listar productos", "request": { "method": "GET", "url": "{{baseUrl}}/api/productos" } },
+        { "name": "GET buscar producto por ID", "request": { "method": "GET", "url": "{{baseUrl}}/api/productos/{{productoId}}" } },
+        { "name": "GET productos por categoria", "request": { "method": "GET", "url": "{{baseUrl}}/api/productos/categoria/{{categoriaId}}" } },
+        {
+          "name": "PUT actualizar producto",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"codigo\": \"LAB-LAP-{{$timestamp}}-{{$randomInt}}\",\n  \"nombre\": \"Laptop Lenovo actualizada\",\n  \"descripcion\": \"Producto actualizado desde Postman\",\n  \"precioVenta\": 899.99,\n  \"existencia\": 12,\n  \"categoriaId\": {{categoriaId}},\n  \"proveedorId\": {{proveedorId}}\n}" },
+            "url": "{{baseUrl}}/api/productos/{{productoId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Etiquetas",
+      "item": [
+        { "name": "POST crear Oferta", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Oferta\"\n}" }, "url": "{{baseUrl}}/api/etiquetas" } },
+        { "name": "POST crear Importado", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Importado\"\n}" }, "url": "{{baseUrl}}/api/etiquetas" } },
+        { "name": "POST crear Empresarial", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Empresarial\"\n}" }, "url": "{{baseUrl}}/api/etiquetas" } },
+        { "name": "POST crear Portátil", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Portátil\"\n}" }, "url": "{{baseUrl}}/api/etiquetas" } },
+        {
+          "name": "POST crear Gaming",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Gaming\"\n}" }, "url": "{{baseUrl}}/api/etiquetas" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Etiqueta Gaming disponible', function () { pm.response.to.have.status(200); });", "pm.collectionVariables.set('etiquetaId', pm.response.json().id);"] } }]
+        },
+        { "name": "GET listar etiquetas", "request": { "method": "GET", "url": "{{baseUrl}}/api/etiquetas" } }
+      ]
+    },
+    {
+      "name": "Relaciones N a N y reto final",
+      "item": [
+        { "name": "POST asociar Gaming al laptop", "request": { "method": "POST", "url": "{{baseUrl}}/api/productos/{{productoId}}/etiquetas/{{etiquetaId}}" } },
+        { "name": "POST asociar Gaming al segundo producto", "request": { "method": "POST", "url": "{{baseUrl}}/api/productos/{{productoAlternoId}}/etiquetas/{{etiquetaId}}" } },
+        { "name": "GET productos por etiqueta", "request": { "method": "GET", "url": "{{baseUrl}}/api/productos/etiqueta/{{etiquetaId}}" } },
+        { "name": "DELETE solo la asociacion laptop-etiqueta", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/productos/{{productoId}}/etiquetas/{{etiquetaId}}" } },
+        { "name": "GET comprobar laptop sin asociacion", "request": { "method": "GET", "url": "{{baseUrl}}/api/productos/{{productoId}}" } },
+        { "name": "DELETE producto alterno", "request": { "method": "DELETE", "url": "{{baseUrl}}/api/productos/{{productoAlternoId}}" } }
+      ]
+    }
+  ]
+}
